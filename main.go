@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -18,6 +19,14 @@ var (
 	tsuruHost  string
 	apps       map[string]string = map[string]string{}
 )
+
+func init() {
+	flag.StringVar(&endpoint, "e", "my-logstash.com:1984", "measure logstash endpoint")
+	flag.StringVar(&tsuruToken, "t", "", "tsuru token")
+	flag.StringVar(&tsuruHost, "h", "my-tsuru.com", "tsuru host")
+
+	flag.Parse()
+}
 
 type document struct {
 	Client string `json:"client"`
