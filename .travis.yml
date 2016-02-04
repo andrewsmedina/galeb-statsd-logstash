@@ -1,5 +1,5 @@
 language: go
-sudo: false
+sudo: required
 go:
   - 1.5.3
   - 1.6rc2
@@ -7,7 +7,15 @@ go:
 env:
   global:
     - GO15VENDOREXPERIMENT=1
-script: go test ./...
+  matrix:
+    - GOARCH=amd64
+script:
+  - go test ./...
+  - go build -ldflags "-linkmode external -extldflags -static"
+after_success:
+  - travis/docker_image.bash
+services:
+  - docker
 matrix:
   allow_failures:
     - go: tip
