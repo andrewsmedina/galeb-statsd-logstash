@@ -11,8 +11,8 @@ if [ -n "${DOCKER_TAG}" ] && [ "${TRAVIS_GO_VERSION}" = "1.5.3" ]; then
   }
 }
 EOF
-	docker build -t tsuru/galeb-statsd-logstash:${DOCKER_TAG} .
-	docker push tsuru/galeb-statsd-logstash:${DOCKER_TAG}
+	docker build -t andrewsmedina/galeb-statsd-logstash:${DOCKER_TAG} .
+	docker push andrewsmedina/galeb-statsd-logstash:${DOCKER_TAG}
 else
 	echo "No image to build"
 fi
