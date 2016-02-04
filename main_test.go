@@ -40,6 +40,7 @@ func runServer(c *check.C) {
 func (S) TestSendDocument(c *check.C) {
 	apps["myapp.cloud.tsuru.com"] = "myapp"
 	defer func() { apps["myapp.cloud.tsuru.com"] = "" }()
+	endpoint = ":1984"
 	runServer(c)
 	doc := &document{
 		Client: "tsuru",
@@ -48,7 +49,6 @@ func (S) TestSendDocument(c *check.C) {
 		App:    "myapp",
 		Value:  44,
 	}
-	endpoint = ":1984"
 	err := sendDocument(doc)
 	c.Assert(err, check.IsNil)
 }
