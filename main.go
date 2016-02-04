@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -116,7 +117,22 @@ func handle(data []byte) (*document, error) {
 	return doc, nil
 }
 
+func cacheApps() {
+	err := getApps()
+	if err != nil {
+		log.Print(err)
+	}
+	c := time.Tick(10 * time.Minute)
+	for range c {
+		err = getApps()
+		if err != nil {
+			log.Print(err)
+		}
+	}
+}
+
 func main() {
+	go cacheApps()
 	addr, err := net.ResolveUDPAddr("udp", ":8125")
 	if err != nil {
 		log.Fatal(err)
