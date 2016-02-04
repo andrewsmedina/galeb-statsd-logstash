@@ -2,16 +2,21 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
+	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
 var (
-	endpoint string
-	apps     map[string]string = map[string]string{}
+	endpoint   string
+	tsuruToken string
+	tsuruHost  string
+	apps       map[string]string = map[string]string{}
 )
 
 type document struct {
@@ -20,6 +25,42 @@ type document struct {
 	Count  int    `json:"count"`
 	App    string `json:"app"`
 	Value  int    `json:"value"`
+}
+
+type app struct {
+	Name  string   `json:"name"`
+	Ip    string   `json:"ip"`
+	Cname []string `json:"cname"`
+}
+
+func getApps() error {
+	url := fmt.Sprintf("%s/apps", tsuruHost)
+	req, err := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", "b "+tsuruToken)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("Error trying to get apps info: HTTP %d", resp.StatusCode)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("Error trying to get apps info: %s", err)
+	}
+	appList := []app{}
+	err = json.Unmarshal(body, &appList)
+	if err != nil {
+		return err
+	}
+	for _, a := range appList {
+		apps[a.Ip] = a.Name
+		for _, cname := range a.Cname {
+			apps[cname] = a.Name
+		}
+	}
+	return nil
 }
 
 func sendDocument(doc *document) error {
